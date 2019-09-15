@@ -1,0 +1,246 @@
+{% include 'js.html' %}
+<p id="testText">Hello</p>
+<button type="button" id="openWallet">Open Wallet</button>
+<button type="button" id="getWalletAddress">Get Wallet Address</button>
+<p id="WalletAddress">Wallet Address: </p>
+
+<button type="button" id="getWalletKeys" getKeys = "/walletkeys/">Get Keys</button>
+<p id="WalletKeyV">Wallet Keys: </p>
+<p id="WalletKeyPubS"></p>
+<p id="WalletKeyPriS"></p>
+
+
+<p id="WalletBalance">Wallet Balance - unlocked:  locked: </p>
+<button type="button" id="getWalletStatus" getStat = "/walletstatus/">Get Wallet Status</button>
+<p id="WalletStatus">Wallet Status: </p>
+
+
+<button type="button" id="send11trtl">Send 11 trtl</button>
+<p id="TxStatus">Tx Status: </p>
+
+<p>Private View Key:</p>
+<input id="PVK">
+<p>Private Spend Key:</p>
+<input id="PSK">
+<button type="button" id="importWallet">Import Wallet</button>
+
+<button type="button" id="closeWallet">Close Wallet</button>
+
+
+<!--<button class="navbar-toggler" type="button" id="createWallet">Create Wallet</button>-->
+<script>
+	// Post request for sign up modal
+	$(document).ready(function(){
+
+		var node = '174.138.29.231'
+		var nodePort = 11898
+		var walletAPI = 'http://174.138.29.231:8070'
+		var XAPIKEY = 'm5o4u3s2e1-sabo'
+		var walletFileName = 'sabo-trtl-ATM-wallet.wallet'
+		var walletFilePW = "m5o4u3s2e1-sabo-ATM"
+
+		$("#closeWallet").on('click', function(event){
+			event.preventDefault();
+
+
+			$.ajax({
+				url: walletAPI+'/wallet',
+				method: 'DELETE',
+				headers: { 'X-API-KEY': XAPIKEY, },
+
+				success: function(data){
+					console.log(data);
+					$('#testText').text('wallet closed');
+					}
+				})
+			})
+		$("#getWalletKeys").on('click', function(event){
+			event.preventDefault();
+
+			$.ajax({
+				url: $("#getWalletKeys").attr('getKeys'),
+				method: 'GET',
+
+				success: function(data){
+					console.log(data);
+					$('#WalletKeyV').text('Wallet Keys - View:' + data['private_view_key']);
+					$('#WalletKeyPubS').text('Wallet Keys - Public Spend:' + data['public_spend_key']);
+					$('#WalletKeyPriS').text('Wallet Keys - Private Spend:' + data['private_spend_key']);
+					}
+				})
+
+		})
+
+		$("#importWallet").on('click', function(event){
+			event.preventDefault();
+
+			$.ajax({
+				url: walletAPI +'/wallet/import/key',
+				method: 'POST',
+				headers: { 'X-API-KEY': XAPIKEY, },
+				data: JSON.stringify({
+						"daemonHost": node,
+				  		"daemonPort": nodePort,
+						"filename": walletFileName,
+						"password": walletFilePW,
+						"scanHeight": 1600000,
+						"privateViewKey": $('#PVK').val(),
+  						"privateSpendKey": $('#PSK').val()
+						}
+					),
+
+				success: function(data){
+					console.log(data);
+					}
+				})
+
+			$('#testText').text('wallet imported');
+
+		})
+
+		$("#createWallet").on('click', function(event){
+			event.preventDefault();
+
+			$.ajax({
+				url: walletAPI +'/wallet/create',
+				method: 'POST',
+				headers: { 'X-API-KEY': XAPIKEY, },
+				data: JSON.stringify({
+						"daemonHost": node,
+				  		"daemonPort": nodePort,
+						"filename": walletFileName,
+						"password": walletFilePW
+						}
+					),
+
+				success: function(data){
+					console.log(data);
+					}
+				})
+
+			$('#testText').text('wallet created');
+
+		})
+
+		$("#openWallet").on('click', function(event){
+			event.preventDefault();
+
+			$.ajax({
+				url: walletAPI +'/wallet/open',
+				method: 'POST',
+				headers: { 'X-API-KEY': 'm5o4u3s2e1-sabo', },
+				data: JSON.stringify({
+						"daemonHost": node,
+				  		"daemonPort": nodePort,
+						"filename": walletFileName,
+						"password": walletFilePW
+						}
+					),
+
+				success: function(data){
+					console.log(data);
+					}
+				})
+
+			$('#testText').text('Yo sup');
+
+		})
+
+
+		$("#getWalletAddress").on('click', function(event){
+			event.preventDefault();
+
+			$.ajax({
+				url: 'http://174.138.29.231:8070/addresses',
+				method: 'GET',
+				headers: { 'X-API-KEY': 'm5o4u3s2e1-sabo', },
+
+				success: function(data){
+					console.log(data);
+
+					$('#WalletAddress').text('Wallet Address: '+data['addresses'][0]);
+					}
+				})
+
+			$.ajax({
+				url: 'http://174.138.29.231:8070/balance',
+				method: 'GET',
+				headers: { 'X-API-KEY': 'm5o4u3s2e1-sabo', },
+
+				success: function(data){
+					console.log(data);
+					var unlocked = data['unlocked']/100
+					var locked = data['locked']/100
+					$('#WalletBalance').text('Wallet Balance - unlocked:'+unlocked + ' locked:' + locked);
+
+					}
+				})
+			})
+
+			$("#getWalletStatus").on('click', function(event){
+			event.preventDefault();
+
+			/*$.ajax({
+				url: 'http://174.138.29.231:8070/status',
+				method: 'GET',
+				headers: { 'X-API-KEY': 'm5o4u3s2e1-sabo', },
+
+				success: function(data){
+					console.log(data);
+
+					$('#WalletStatus').text('Wallet Status - Wallet Block:'+data['walletBlockCount']+ 
+						" | Daemon Status - "+data['localDaemonBlockCount']+"/"+data['networkBlockCount']);
+					}
+				})*/
+
+			$.ajax({
+						url: $("#getWalletStatus").attr('getStat'),
+						method: 'GET',
+						success: function(data){
+							console.log(data);
+							$('#WalletStatus').text('Wallet Status - Wallet Block:'+data['wallet_block_count']+ 
+								" | Daemon Status - "+data['local_daemon_block_count']+"/"+data['network_block_count']);
+							}
+						})
+				})
+
+			$("#send11trtl").on('click', function(event){
+			event.preventDefault();
+
+			$.ajax({
+				url: 'http://174.138.29.231:8070/transactions/send/basic',
+				method: 'POST',
+				headers: { 'X-API-KEY': 'm5o4u3s2e1-sabo', },
+				data: JSON.stringify({
+  						"destination": "TRTLv1nQeHwinWcyxrPQSN3gdqxgKZqawZVJzQJ59Kwq45QvU9vafwG1bff2BecELJ3qaS16TeWEPW6UvxzxRd4u6D9wzUU5ERE",
+  						"amount": 1100,
+  						"paymentID": ""
+						}
+					),
+				success: function(data){
+					console.log(data);
+					$('#TxStatus').text('11 trtl sent successfully - tx hash:'+data['transactionHash']);
+					}
+				})
+		})
+	})
+
+</script>
+<!--
+			$.ajax({
+					url: '/wallet/create',
+					method: 'POST',
+					data: {
+						  "daemonHost": "127.0.0.1",
+						  "daemonPort": 8070,
+						  "filename": "mywallet.wallet",
+						  "password": "123"
+						},
+        			contentType: false,
+        			processData: false,
+					success: function(data){
+						console.log(data);
+						}
+					})
+
+						 -->

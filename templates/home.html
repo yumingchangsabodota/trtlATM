@@ -1,0 +1,106 @@
+{% extends "header.html" %}
+{% block content %}
+{% load staticfiles %}
+<div class='container-fluid'>
+
+<div class="row justify-content-center pt-3">
+  <img src="{% static 'img/turtlecoin_wordmark_svg.svg' %}" class="img-fluid" alt="Responsive image">
+</div>
+
+<div class="row justify-content-center">
+  <div class="alert alert-success">
+    <center><b><font size="5">TRTL ATM</b></font></center>
+    <center id="wallet_balance"><br>Balance: {{wallet_balance}}</center>
+    <center class="container-fluid" id="wallet_address"><br>Wallet Address:<br> {{wallet_address}}</center>
+    <center id="Trtl_price"><br>Exchange rate: 1 TRTL ~ {{price}} USD<br></center>
+    <center><br></center>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+<form class="form-group my-2 my-lg-0" method="GET" action='/payment/process/'>
+<div class="input-group mb-3">
+	<div class="input-group-prepend">
+    <span class="input-group-text">Send To</span>
+  </div>
+  <input type="text" class="form-control" placeholder="**Your TRTL Wallet Address" aria-label="Username" aria-describedby="basic-addon1" name='sendToWallet'>
+</div>
+
+<div class="input-group mb-3">
+  <div class="input-group-prepend">
+    <span class="input-group-text">TRL</span>
+  </div>
+  <input type="number" min='1' max='1000' step=".01" class="form-control" aria-label="Amount (to the nearest dollar)" id="trtlamount" placeholder="1.00" name='amountInTRTL'/>
+  <div class="input-group-append">
+    <span class="input-group-text">~</span>
+  </div>
+  <input type="number" min='1' max='1000' step=".01" class="form-control" aria-label="Amount (to the nearest dollar)" id="usdamount" placeholder="1.00" name='amountInUSD'/>
+    <div class="input-group-append">
+    <span class="input-group-text">USD</span>
+  </div>
+</div>
+
+<div class="input-group mb-3">
+  <div class="input-group-prepend">
+    <span class="input-group-text">Nickname</span>
+  </div>
+  <input type="text" class="form-control" placeholder="optional" aria-label="Nickname" aria-describedby="basic-addon1" name='nickname'>
+</div>
+<div class="row justify-content-md-center">
+<button class="btn btn-secondary btn-lg" type="submit" id="pay-now">Get TRTL</button>
+</div>
+</form>
+</div>
+
+
+</div>
+
+<script type="text/javascript">
+  var input1 = document.getElementById('trtlamount');
+  var input2 = document.getElementById('usdamount');
+
+  input1.addEventListener('change', function() {
+    if (parseFloat(input1.value) > 1000){
+      input1.value = 1000
+    }
+    if (parseFloat(input1.value) < 1){
+      input1.value = 1
+    }
+    input1.value = parseFloat(input1.value).toFixed(2);
+    input2.value = input1.value;
+  });
+
+
+  input2.addEventListener('change', function() {
+    if (parseFloat(input2.value) > 1000){
+      input1.value = 1000
+    }
+    if (parseFloat(input2.value) < 1){
+      input1.value = 1
+    }
+    input2.value = parseFloat(input2.value).toFixed(2);
+    input1.value = input2.value;
+  });
+
+</script>
+{% endblock	%}
+
+
+<!--
+			$.ajax({
+					url: '/wallet/create',
+					method: 'POST',
+					data: {
+						  "daemonHost": "127.0.0.1",
+						  "daemonPort": 8070,
+						  "filename": "mywallet.wallet",
+						  "password": "123"
+						},
+        			contentType: false,
+        			processData: false,
+					success: function(data){
+						console.log(data);
+						}
+					})
+
+						 -->
