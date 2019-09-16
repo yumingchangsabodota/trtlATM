@@ -100,6 +100,7 @@ def walletAddressValidator(address):
 	# Validate an address. If the address is valid, a 200 response code will be returned, else a 400 response code will be returned.
 		api_response = api_instance.addresses_validate_post(body)
 		print(api_response)
+#if api_response == 
 	except ApiException as e:
 		print("Exception when calling MiscApi->addresses_validate_post: %s\n" % e)
 
